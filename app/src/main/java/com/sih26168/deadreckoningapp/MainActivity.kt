@@ -27,6 +27,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import com.sih26168.deadreckoningapp.data.RecordedRoutePositionProvider
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +47,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DeadReckoningMapScreen() {
     val context = LocalContext.current
-    val positionProvider = remember { FakeRoutePositionProvider() }
+    val positionProvider = remember { RecordedRoutePositionProvider(context) }
 
     LaunchedEffect(Unit) {
         positionProvider.start()
