@@ -65,6 +65,7 @@ fun DeadReckoningMapScreen() {
     var liveAccel by remember { mutableStateOf(Triple(0f, 0f, 0f)) }
     var liveGyro by remember { mutableStateOf(Triple(0f, 0f, 0f)) }
     var liveGpsText by remember { mutableStateOf("Waiting for GPS...") }
+    var simulateDropout by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(android.content.Context.SENSOR_SERVICE) as android.hardware.SensorManager
@@ -116,6 +117,11 @@ fun DeadReckoningMapScreen() {
     }
 
     val vehicleState by positionProvider.currentState.collectAsState()
+    val displayState = if (simulateDropout) {
+        vehicleState.copy(mode = com.sih26168.deadreckoningapp.data.PositionMode.DEAD_RECKONING)
+    } else {
+        vehicleState
+    }
 
     val mapView = remember {
         MapView(context).apply {
@@ -160,9 +166,18 @@ fun DeadReckoningMapScreen() {
             color = Color.White.copy(alpha = 0.85f)
         ) {
             Text(
-                text = "Mode: ${vehicleState.mode}   Speed: ${"%.1f".format(vehicleState.speedMetersPerSecond)} m/s",
+                text = "Mode: ${displayState.mode}   Speed: ${"%.1f".format(displayState.speedMetersPerSecond)} m/s",
                 modifier = Modifier.padding(8.dp)
             )
+        }
+
+        androidx.compose.material3.Button(
+            onClick = { simulateDropout = !simulateDropout },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(12.dp)
+        ) {
+            Text(if (simulateDropout) "Restore GPS" else "Simulate Tunnel / Kill GPS")
         }
         Surface(
             modifier = Modifier
