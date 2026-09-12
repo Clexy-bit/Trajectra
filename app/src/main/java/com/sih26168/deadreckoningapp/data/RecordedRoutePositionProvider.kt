@@ -66,8 +66,13 @@ class RecordedRoutePositionProvider(private val context: Context) : PositionProv
             if (points.isEmpty()) return@launch
             var previousT = points.first().t
 
+            // Speeds up wall-clock playback for demo purposes only.
+            // The "speed" values shown on screen remain physically accurate —
+            // this only compresses how long you have to wait watching it.
+            val playbackSpeedMultiplier = 4.0
+
             for (point in points) {
-                val waitMs = ((point.t - previousT) * 1000).toLong().coerceAtLeast(0)
+                val waitMs = (((point.t - previousT) * 1000) / playbackSpeedMultiplier).toLong().coerceAtLeast(0)
                 delay(waitMs)
                 previousT = point.t
 
